@@ -36,3 +36,5 @@
 
 - name: install csv plugins
   shell: "grafana-cli plugins install marcusolsson-csv-datasource"
+  notify:
+    - restart grafana
