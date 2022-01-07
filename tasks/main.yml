@@ -7,11 +7,11 @@
 - name: get url
   get_url:
     url: "{{ grafana_url }}"
-    dest: /opt/smicro/grafana/grafana-enterprise-8.3.3-1.x86_64.rpm
+    dest: "{{ grafana_path }}"
 
 - name: install grafana
   yum:
-   name: /opt/smicro/grafana/grafana-enterprise-8.3.3-1.x86_64.rpm
+   name: "{{ grafana_version }}"
    state: present
 
 - name: enable and start grafana-server
@@ -22,7 +22,7 @@
 
 - name: wait for service up
   uri:
-    url: "http://192.168.43.91:3000"
+    url: "http://sm1.dev.com:3000"
     status_code: 200
   register: __result
   until: __result.status == 200
