@@ -1,0 +1,38 @@
+---
+- name: create directory
+  file:
+    path: /opt/smicro/grafana
+    state: directory
+
+- name: get url
+  get_url:
+    url: "{{ grafana_url }}"
+    dest: /opt/smicro/grafana/grafana-enterprise-8.3.3-1.x86_64.rpm
+
+- name: install grafana
+  yum:
+   name: /opt/smicro/grafana/grafana-enterprise-8.3.3-1.x86_64.rpm
+   state: present
+
+- name: enable and start grafana-server
+  service:
+    name: grafana-server
+    enabled: yes
+    state: started
+
+- name: wait for service up
+  uri:
+    url: "http://192.168.43.91:3000"
+    status_code: 200
+  register: __result
+  until: __result.status == 200
+  retries: 120
+  delay: 1
+
+- name: change admin password for grafana gui
+  shell : "grafana-cli admin reset-admin-password {{ grafana_admin_password }}"
+  register: __command_admin
+  changed_when: __command_admin.rc !=0
+
+- name: install csv plugins
+  shell: "grafana-cli plugins install marcusolsson-csv-datasource"
